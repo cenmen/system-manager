@@ -1,0 +1,33 @@
+    .nav-self-style{
+      background-color: rgba(100,149,237,0.4);
+      height: 60px;
+      padding-top: 5px;
+    }
+    a{
+      color: black  !important;
+      font-family: 'STXingkai';
+      display: block;
+    }
+    .nav-left-side{
+      background-color: rgba(0,0,0,0.1);
+      float:left;
+      width:15%;
+      height:900px;
+    }
+    .content-side{ 
+      float:left;
+      width:79%;
+      height:570px;
+      margin-left: 5px;
+      margin-top: 10px;
+    } 
+    .btn{
+      width: 80px;
+    }
+    .between{
+      margin: 5px 0px;
+    }
+    .selectCondition{
+    	margin: 0px 5px;
+    }
+    @charset "UTF-8";

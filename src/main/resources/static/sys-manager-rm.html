@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>自行车管理系统-租借点管理员管理</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="assets/css/sys-manager-all.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+  <script type="text/javascript" src="assets/js/sys-manager-all.js"></script>
+  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+   <script>
+    var page=1; 
+    var isEnd=0;
+	function getAllRentManagerToPrevious() {
+		if(page>=2){
+			page--;
+		}
+		getRentManagerByPage();
+	}
+	
+	function getAllRentManagerToNext() {
+		page++;
+		getRentManagerByPage();
+	}
+	
+	$(function() { 
+		getRentManagerByPage();
+	});
+	
+	function getRentManagerByPage() {
+		$.get("/RentManagerCon/getRentManagerByPage.do",{pageNum:page},
+			    function(data){
+						if(data.length){
+							isEnd = page;
+						      var str = "";
+						        for(i = 0; i <data.length ; i++){
+						        		str +=`<tr><td>${data[i].rm_id}</td><td>${data[i].rm_account}</td><td>${data[i].rm_username}</td><td>${data[i].rm_contact}</td>
+						        			<td>${data[i].rm_create_time}</td><td>${data[i].rm_last_time}</td><td>${data[i].rm_status}</td><td>${data[i].rm_rp_id}</td>
+							        		<td><button type="button" onclick="deleteRentManager('${data[i].rm_id}')" class="btn btn-primary">删除</button>
+							        		<button type="button" onclick="getRentManagerByIdForUpdate('${data[i].rm_id}')" class="btn btn-primary" data-toggle="modal" data-target="#updateModal">编辑</button></td></tr>`
+						        	};
+						      $("#mesContent").html(str);
+						} else {
+							page = isEnd;
+						}
+			    },"json");
+	}
+	
+	function getRentManagerByCondition() {
+		$.get("/RentManagerCon/getRentManagerByCondition.do", {
+			rm_id: $("input[name='findByRMId']").val(), 
+			rm_account: $("input[name='findByRMAccount']").val(), 
+			rm_username: $("input[name='findByRMUsername']").val(), 
+			rm_contact: $("input[name='findByRMContact']").val(), 
+			rm_rp_id: $("input[name='findByRMLocation']").val(), 
+			rm_status: $("input[name='findByStatus']:checked").val()
+			},function(data){
+			 var str = "";
+		        for(i = 0; i < data.length; i++){
+		        	str +=`<tr><td>${data[i].rm_id}</td><td>${data[i].rm_account}</td><td>${data[i].rm_username}</td><td>${data[i].rm_contact}</td>
+		        		<td>${data[i].rm_create_time}</td><td>${data[i].rm_last_time}</td><td>${data[i].rm_status}</td><td>${data[i].rm_rp_id}</td>
+		        		<td><button type="button" onclick="deleteRentManager('${data[i].rm_id}')" class="btn btn-primary">删除</button>
+		        		<button type="button" onclick="getRentManagerByIdForUpdate('${data[i].rm_id}')" class="btn btn-primary" data-toggle="modal" data-target="#updateModal">编辑</button></td></tr>`
+		        	};
+			      $("#mesContent").html(str);
+			    },"json");
+	}
+	
+	function addRentManager() {
+		$.post("/RentManagerCon/addRentManager.do", {
+			rm_account: $("input[name='add_rm_account']").val(),
+			rm_password: $("input[name='add_rm_password']").val(),
+			rm_username: $("input[name='add_rm_username']").val(),
+			rm_contact: $("input[name='add_rm_contact']").val(),
+			rm_status: $("input[name='add_rm_status']:checked").val(),
+			rm_rp_id: $("input[name='add_rm_rp_id']").val(),
+			rm_mark: $("input[name='add_rm_mark']").val()
+			},function(data){
+				  location.reload();
+				  alert("添加成功");
+			    });
+	}
+	
+	function getRentManagerByIdForUpdate(str) {
+		$.post("/RentManagerCon/getRentManagerById.do", {rm_id:str},function(data){
+				$("#update_rm_id").val(data.rm_id);
+				$("#update_rm_account").val(data.rm_account);
+				$("#update_rm_password").val(data.rm_password);
+				$("#update_rm_username").val(data.rm_username);
+				$("#update_rm_contact").val(data.rm_contact);
+				$("#update_rm_create_time").val(data.rm_create_time);
+				$("#update_rm_status").attr("checked", data.rm_status);
+				$("#update_rm_rp_id").val(data.rm_rp_id);
+				$("#update_rm_mark").val(data.rm_mark);
+			    });
+	}
+	
+	function updateRentManager() {
+		$.post("/RentManagerCon/updateRentManager.do", {
+			rm_id: $("input[name='update_rm_id']").val(),
+			rm_account: $("input[name='update_rm_account']").val(),
+			rm_password: $("input[name='update_rm_password']").val(),
+			rm_username: $("input[name='update_rm_username']").val(),
+			rm_contact: $("input[name='update_rm_contact']").val(),
+			rm_create_time: $("input[name='update_rm_create_time']").val(),
+			rm_status: $("input[name='update_rm_status']:checked").val(),
+			rm_rp_id: $("input[name='update_rm_rp_id']").val(),
+			rm_mark: $("input[name='update_rm_mark']").val()
+			},function(data){
+				  location.reload();
+				  alert("修改成功");
+			    });
+	}
+	
+	function deleteRentManager(str) {
+		$.post("/RentManagerCon/deleteRentManager.do", {rm_id:str},function(data){
+				  location.reload();
+			      alert("删除成功");
+			    });
+	}
+</script>
+</head>
+<body>
+
+<div class="header">
+  <ul class="nav justify-content-end nav-self-style">
+    <li class="nav-item">
+      <a class="nav-link" href="#"><img src="assets/images/user-icon.png" width="20px" height="20px"> 系统管理员</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="logout" onclick="SysManagerLogout()"><img src="assets/images/logout-icon.png" width="20px" height="20px"> 退出</a>
+    </li>
+  </ul>
+</div>
+
+<div class="left-side nav-left-side">
+  <ul class="nav nav-pills flex-column">
+    <li class="nav-item">
+      <a class="nav-link" href="sys-manager-bds.html">车辆批量分布管理</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="sys-manager-bp.html">车辆采购管理</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="sys-manager-bq.html">车辆质量管理</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="sys-manager-rm.html">租借点管理员管理</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="sys-manager-rp.html">车辆租借点管理</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="sys-manager-sm.html">系统管理员管理</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="sys-manager-rbm.html">查询统计记录</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="sys-manager-info.html">消息通知</a>
+    </li>
+  </ul>
+</div>
+
+<!-- Tab panes -->
+<div class="content-side">
+    <div class="above">
+      <form class="form-inline">
+        <input type="text" class="form-control condition" name="findByRMId" placeholder="租借点管理员ID">&nbsp;&nbsp;
+        <input type="text" class="form-control condition" name="findByRMAccount" placeholder="租借点管理员账号">&nbsp;&nbsp;
+        <input type="text" class="form-control condition" name="findByRMUsername" placeholder="租借点管理员用户名">&nbsp;&nbsp;
+        <input type="text" class="form-control condition" name="findByRMContact" placeholder="租借点管理员联系方式">&nbsp;&nbsp;
+        <input type="text" class="form-control condition" name="findByRMLocation" placeholder="租借点管理员所在点">&nbsp;&nbsp;
+        <label><input type="checkbox" class="condition"  name="findByStatus">账号是否被启用</label>&nbsp;&nbsp;
+        <button type="button" class="btn btn-primary" onclick="getRentManagerByCondition()">搜索</button>
+      </form>
+    </div>
+    <div class="between">
+      <button type="button" class="btn btn-primary"  onclick="getRentManagerByPage()">查询</button>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">新增</button>
+      <button type="button" class="btn btn-primary"  onclick="getAllRentManagerToPrevious()">上一页</button>
+      <button type="button" class="btn btn-primary"  onclick="getAllRentManagerToNext()">下一页</button>
+    </div>
+    <div class="below">
+      <div id="table-mes">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>管理员ID</th>
+              <th>账号</th>
+              <th>用户名</th>
+              <th>联系方式</th>
+              <th>账号创建时间</th>
+              <th>最近修改时间</th>
+              <th>是否启用</th>
+              <th>所在租借点</th>
+              <th>options</th>
+            </tr>
+          </thead>
+          <tbody id="mesContent">
+          </tbody>
+        </table>
+      </div>
+    </div>
+</div>
+
+<!-- 新增租借点管理员模态框 -->
+  <div class="modal fade" id="addModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+   
+        <!-- 新增租借点管理员模态框头部 -->
+        <div class="modal-header">
+          <h4 class="modal-title">新增租借点管理员</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+   
+        <!-- 新增租借点管理员模态框主体 -->
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="rm_account">账号:</label>
+              <input type="text" class="form-control" id="add_rm_account" name="add_rm_account">
+            </div>
+            <div class="form-group">
+              <label for="rm_password">密码:</label>
+              <input type="password" class="form-control" id="add_rm_password" name="add_rm_password">
+            </div>
+            <div class="form-group">
+              <label for="rm_username">用户名:</label>
+              <input type="text" class="form-control" id="add_rm_username" name="add_rm_username">
+            </div>
+            <div class="form-group">
+              <label for="rm_contact">联系方式:</label>
+              <input type="text" class="form-control" id="add_rm_contact" name="add_rm_contact">
+            </div>
+            <div class="form-check">
+		      <label class="rm_status">
+		        <input type="checkbox" class="form-check-input" id="add_rm_status" name="add_rm_status">账号是否启用
+		      </label>
+		    </div>
+            <div class="form-group">
+              <label for="rm_rp_id">所在租借点:</label>
+              <input type="text" class="form-control" id="add_rm_rp_id" name="add_rm_rp_id">
+            </div>
+            <div class="form-group">
+              <label for="rm_mark">备注:</label>
+              <input type="text" class="form-control" id="add_rm_mark" name="add_rm_mark">
+            </div>
+          </form>
+        </div>
+   
+        <!-- 新增租借点管理员模态框底部 -->
+        <div class="modal-footer">
+          <button type="button" onclick="addRentManager()" class="btn btn-primary">确定</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+        </div>
+   
+      </div>
+    </div>
+  </div>
+
+<!-- 编辑租借点管理员模态框 -->
+  <div class="modal fade" id="updateModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+   
+        <!-- 编辑租借点管理员模态框头部 -->
+        <div class="modal-header">
+          <h4 class="modal-title">编辑租借点管理员</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+   
+        <!-- 编辑租借点管理员模态框主体 -->
+        <div class="modal-body">
+          <form>
+          	<div class="form-group">
+              <label for="rm_id">管理员ID:</label>
+              <input type="text" class="form-control" id="update_rm_id" name="update_rm_id" disabled="disabled">
+            </div>
+            <div class="form-group">
+              <label for="rm_account">账户:</label>
+              <input type="text" class="form-control" id="update_rm_account" name="update_rm_account">
+            </div>
+            <div class="form-group">
+              <label for="rm_password">密码:</label>
+              <input type="password" class="form-control" id="update_rm_password" name="update_rm_password" disabled="disabled">
+            </div>
+            <div class="form-group">
+              <label for="rm_username">用户名:</label>
+              <input type="text" class="form-control" id="update_rm_username" name="update_rm_username">
+            </div>
+            <div class="form-group">
+              <label for="rm_contact">联系方式:</label>
+              <input type="text" class="form-control" id="update_rm_contact" name="update_rm_contact">
+            </div>
+            <div class="form-group">
+              <label for="rm_create_time">账号创建时间:</label>
+              <input type="text" class="form-control" id="update_rm_create_time" name="update_rm_create_time" disabled="disabled">
+            </div>
+            <div class="form-check">
+		      <label class="rm_status">
+		        <input type="checkbox" class="form-check-input" id="update_rm_status" name="update_rm_status">账号是否启用
+		      </label>
+		    </div>
+            <div class="form-group">
+              <label for="rm_rp_id">所在租借点:</label>
+              <input type="text" class="form-control" id="update_rm_rp_id" name="update_rm_rp_id">
+            </div>
+            <div class="form-group">
+              <label for="rm_mark">备注</label>
+              <input type="text" class="form-control" id="update_rm_mark" name="update_rm_mark">
+            </div>
+          </form>
+        </div>
+   
+        <!-- 编辑租借点管理员模态框底部 -->
+        <div class="modal-footer">
+          <button type="button" onclick="updateRentManager()" class="btn btn-primary">确定</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+        </div>
+   
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html>
